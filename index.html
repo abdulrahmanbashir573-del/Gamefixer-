@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محرر الأكواد أونلاين</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
         body { font-family: 'Cairo', sans-serif; }
-        #editor-container { height: 60vh; }
+        #editor-container { height: 50vh; }
         .console-output { 
             background: #1e1e1e; 
             font-family: 'Courier New', monospace; 
@@ -31,236 +30,185 @@
                     </svg>
                 </div>
                 <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    محرر الأكواد
+                    محرر بايثون
                 </h1>
             </div>
             
             <div class="flex gap-3">
-                <button onclick="runCode()" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2 shadow-lg hover:shadow-green-500/50">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                    </svg>
-                    تشغيل
+                <button onclick="runCode()" id="runBtn" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2">
+                    <span>▶ تشغيل</span>
                 </button>
-                <button onclick="saveCode()" id="saveBtn" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2 shadow-lg hover:shadow-blue-500/50">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                    </svg>
-                    حفظ
-                </button>            </div>
+                <button onclick="clearCode()" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-semibold transition">
+                    مسح
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- المحتوى الرئيسي -->
     <main class="container mx-auto p-4">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- حالة التحميل -->        <div id="loading" class="bg-blue-900/50 border border-blue-500 rounded-lg p-4 mb-4 text-center">
+            <div class="animate-pulse">جاري تحميل بايثون... يرجى الانتظار</div>
+            <div class="text-sm text-blue-300 mt-2">قد يستغرق دقيقة في أول مرة</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
             <!-- المحرر -->
-            <div class="lg:col-span-2 bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
+            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
                 <div class="bg-gray-700 px-4 py-2 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
                     <span class="text-gray-400 text-sm">main.py</span>
                 </div>
-                <div id="editor-container" class="border-t border-gray-700"></div>
+                <div id="editor-container"></div>
             </div>
 
             <!-- الكونسول -->
             <div class="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
-                <div class="bg-gray-700 px-4 py-3 flex items-center justify-between">
-                    <h2 class="font-semibold flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3"></path>
-                        </svg>
-                        المخرجات
-                    </h2>
-                    <button onclick="clearConsole()" class="text-xs text-gray-400 hover:text-white transition">
-                        مسح
-                    </button>
+                <div class="bg-gray-700 px-4 py-3">
+                    <h2 class="font-semibold text-green-400">المخرجات</h2>
                 </div>
-                <div id="console" class="console-output p-4 text-green-400 text-sm leading-relaxed">
-                    <div class="text-gray-500 italic">اضغط "تشغيل" لرؤية النتيجة...</div>
+                <div id="console" class="console-output p-4 text-green-400 text-sm h-full min-h-[200px]">
+                    <div class="text-gray-500">في انتظار التنفيذ...</div>
                 </div>
             </div>
         </div>
 
-        <!-- أمثلة سريعة -->
+        <!-- أمثلة -->
         <div class="mt-6 bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h3 class="text-lg font-semibold mb-4 text-purple-400">أمثلة سريعة:</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button onclick="loadExample('hello')" class="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-right transition border border-gray-600 hover:border-purple-500">
-                    <div class="font-semibold text-sm">👋 Hello World</div>
-                    <div class="text-xs text-gray-400 mt-1">أول برنامج</div>
+            <h3 class="text-lg font-semibold mb-4 text-purple-400">أمثلة:</h3>
+            <div class="flex gap-3 flex-wrap">
+                <button onclick="setExample('hello')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+                    Hello World
                 </button>
-                <button onclick="loadExample('calculator')" class="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-right transition border border-gray-600 hover:border-purple-500">
-                    <div class="font-semibold text-sm">🔢 آلة حاسبة</div>                    <div class="text-xs text-gray-400 mt-1">عمليات رياضية</div>
+                <button onclick="setExample('calc')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+                    آلة حاسبة
                 </button>
-                <button onclick="loadExample('loop')" class="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-right transition border border-gray-600 hover:border-purple-500">
-                    <div class="font-semibold text-sm">🔄 حلقة تكرار</div>
-                    <div class="text-xs text-gray-400 mt-1">Loop example</div>
+                <button onclick="setExample('loop')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+                    Loop
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 border-t border-gray-700 mt-8 py-6 text-center text-gray-400 text-sm">
-        <p>تم التطوير بـ ❤️ باستخدام Pyodide و Monaco Editor</p>
-    </footer>
-
+    <!-- تحميل Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <!-- تحميل Monaco Editor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    
     <script>
-        let editor;
-        let pyodide = null;
+        let editor;        let pyodide = null;
+        let isPyodideLoading = false;
 
         // تهيئة المحرر
-        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+        require.config({ 
+            paths: { 
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' 
+            } 
+        });
+
         require(['vs/editor/editor.main'], function() {
             editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: '# اكتب كود بايثون هنا\nprint("Hello World!")\n\n# جرب تغيير النص وتشغيل الكود',
+                value: '# اكتب كود بايثون هنا\nprint("Hello World!")\n',
                 language: 'python',
                 theme: 'vs-dark',
                 fontSize: 14,
-                fontFamily: 'Courier New',
-                minimap: { enabled: true },
+                minimap: { enabled: false },
                 scrollBeyondLastLine: false,
-                automaticLayout: true,
-                rtl: true
+                automaticLayout: true
             });
         });
 
-        // تحميل Pyodide
-        async function loadPyodide() {
-            if (pyodide) return pyodide;
-            addToConsole('جاري تحميل بايثون... انتظر قليلاً...');
-            pyodide = await loadPyodide();
-            addToConsole('✅ تم تحميل بايثون بنجاح!');
-            return pyodide;
+        // تحميل Pyodide مرة واحدة
+        async function initPyodide() {
+            if (pyodide || isPyodideLoading) return pyodide;
+            
+            isPyodideLoading = true;
+            try {
+                pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"
+                });
+                document.getElementById('loading').style.display = 'none';
+                addToConsole('✅ جاهز للتشغيل!');
+                return pyodide;
+            } catch (error) {
+                addToConsole('❌ خطأ في التحميل: ' + error.message, 'error');
+                isPyodideLoading = false;
+                return null;
+            }
         }
 
         // تشغيل الكود
         async function runCode() {
+            const runBtn = document.getElementById('runBtn');
+            const code = editor.getValue();
+            
+            if (!code.trim()) {
+                addToConsole('⚠️ اكتب كود أولاً!', 'error');
+                return;
+            }
+            runBtn.innerHTML = '<span>⏳ جاري التنفيذ...</span>';
+            runBtn.disabled = true;
+            
             try {
-                const pyodideInstance = await loadPyodide();
-                const code = editor.getValue();                
-                addToConsole('🚀 جاري التنفيذ...\n' + '='.repeat(40));
-                
-                // إعادة توجيه المخرجات
-                let output = [];
-                pyodideInstance.setStdout({ 
-                    batched: (msg) => { 
-                        output.push(msg); 
-                        addToConsole(msg);
-                    } 
-                });
-                
-                await pyodideInstance.runPythonAsync(code);
-                
-                if (output.length === 0) {
-                    addToConsole('✅ تم التنفيذ بنجاح (لا توجد مخرجات)');
+                // تحميل Pyodide لو مش محمل
+                if (!pyodide) {
+                    await initPyodide();
+                    if (!pyodide) {
+                        runBtn.innerHTML = '<span>▶ تشغيل</span>';
+                        runBtn.disabled = false;
+                        return;
+                    }
                 }
+
+                addToConsole('🚀 executing...\n' + '='.repeat(40));
+                
+                // تشغيل الكود
+                await pyodide.runPythonAsync(code);
                 
             } catch (error) {
-                addToConsole('❌ خطأ: ' + error.message, 'error');
+                addToConsole('❌ Error: ' + error.message, 'error');
+            } finally {
+                runBtn.innerHTML = '<span>▶ تشغيل</span>';
+                runBtn.disabled = false;
             }
         }
 
-        // إضافة نص للكونسول
+        // إضافة للكونسول
         function addToConsole(text, type = 'normal') {
             const consoleDiv = document.getElementById('console');
-            if (consoleDiv.children[0]?.classList.contains('italic')) {
+            if (consoleDiv.children[0]?.textContent === 'في انتظار التنفيذ...') {
                 consoleDiv.innerHTML = '';
             }
             
             const line = document.createElement('div');
-            line.className = 'mb-1 ' + (type === 'error' ? 'text-red-400' : 'text-green-400');
+            line.className = 'mb-2 ' + (type === 'error' ? 'text-red-400' : 'text-green-400');
             line.textContent = text;
             consoleDiv.appendChild(line);
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
         }
 
-        // مسح الكونسول
-        function clearConsole() {
-            document.getElementById('console').innerHTML = '<div class="text-gray-500 italic">اضغط "تشغيل" لرؤية النتيجة...</div>';
+        // مسح الكود
+        function clearCode() {
+            editor.setValue('');
+            document.getElementById('console').innerHTML = '<div class="text-gray-500">في انتظار التنفيذ...</div>';
         }
 
-        // حفظ الكود (محاكاة)
-        async function saveCode() {
-            const code = editor.getValue();
-            const saveBtn = document.getElementById('saveBtn');
-            const originalText = saveBtn.innerHTML;
-            
-            saveBtn.innerHTML = '⏳ جاري الحفظ...';
-            saveBtn.disabled = true;            
-            // محاكاة الحفظ (يمكنك ربطها بـ Supabase لاحقاً)
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // إنشاء رابط فريد
-            const projectId = Math.random().toString(36).substring(7);
-            const shareUrl = window.location.href.split('#')[0] + '#project=' + projectId;
-            
-            // حفظ في localStorage
-            localStorage.setItem('project_' + projectId, code);
-            
-            addToConsole('💾 تم حفظ المشروع!');
-            addToConsole('🔗 الرابط: ' + shareUrl);
-            
-            // نسخ الرابط للحافظة
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('تم الحفظ! تم نسخ الرابط للحافظة');
-            });
-            
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-        }
-
-        // تحميل الأمثلة
-        function loadExample(type) {
-            const examples = {
-                hello: `# برنامج Hello World
-name = input("ما اسمك؟ ")
-print(f"مرحباً {name}! 👋")
-print("أهلاً بك في محرر الأكواد")`,
-                
-                calculator: `# آلة حاسبة بسيطة
-num1 = 10
-num2 = 5
-
-print("الآلة الحاسبة 🔢")
-print("=" * 30)
-print(f"{num1} + {num2} = {num1 + num2}")
-print(f"{num1} - {num2} = {num1 - num2}")
-print(f"{num1} × {num2} = {num1 * num2}")
-print(f"{num1} ÷ {num2} = {num1 / num2}")`,
-                
-                loop: `# حلقة تكرار
-print("عداد من 1 إلى 10:\n")
-for i in range(1, 11):
-    print(f"الرقم {i} " + "⭐" * i)
-
-print("\n✅ انتهى العد!")`
+        // الأمثلة
+        function setExample(type) {            const examples = {
+                hello: 'print("Hello World!")\nname = input("What is your name? ")\nprint(f"Welcome {name}!")',
+                calc: 'num1 = 10\nnum2 = 5\nprint(f"{num1} + {num2} = {num1 + num2}")\nprint(f"{num1} * {num2} = {num1 * num2}")',
+                loop: 'for i in range(1, 6):\n    print(f"Count: {i}")\nprint("Done!")'
             };
-                        if (editor && examples[type]) {
+            
+            if (editor && examples[type]) {
                 editor.setValue(examples[type]);
-                addToConsole(`📋 تم تحميل مثال: ${type}`);
             }
         }
 
-        // تحميل مشروع من الرابط
-        window.onload = function() {
-            const hash = window.location.hash;
-            if (hash.includes('project=')) {
-                const projectId = hash.split('project=')[1];
-                const savedCode = localStorage.getItem('project_' + projectId);
-                if (savedCode && editor) {
-                    editor.setValue(savedCode);
-                    addToConsole('📂 تم تحميل المشروع المحفوظ');
-                }
-            }
-        };
+        // تهيئة Pyodide عند التحميل
+        window.addEventListener('load', () => {
+            initPyodide();
+        });
     </script>
 </body>
 </html>
