@@ -2,213 +2,792 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرر الأكواد أونلاين</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>GameFixer | تحميل ألعاب وبرامج - فيديوهات وشروحات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; }
-        #editor-container { height: 50vh; }
-        .console-output { 
-            background: #1e1e1e; 
-            font-family: 'Courier New', monospace; 
-            max-height: 30vh;
-            overflow-y: auto;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.2s;
+            line-height: 1.6;
+        }
+        :root {
+            --bg-primary: #f9fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e2a3e;
+            --text-secondary: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            --border: #e2e8f0;
+            --code-bg: #f1f5f9;
+            --logo-glow: 0 0 15px rgba(59,130,246,0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #38bdf8;
+            --accent-hover: #7dd3fc;
+            --border: #334155;
+            --code-bg: #0f172a;
+        }
+        a { text-decoration: none; color: var(--accent); transition: 0.2s; }
+        a:hover { color: var(--accent-hover); }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 24px; }
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 16px 0;
+            gap: 16px;
+        }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--logo-glow);
+        }
+        .logo-icon i { font-size: 28px; color: white; }
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .logo-sub { font-size: 0.7rem; letter-spacing: 2px; color: var(--text-secondary); }
+        .nav-links { display: flex; gap: 24px; flex-wrap: wrap; }
+        .nav-links a { color: var(--text-primary); font-weight: 500; }
+        .dark-toggle {
+            background: var(--code-bg);
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 40px;
+            color: var(--text-primary);
+        }
+        .search-box { display: flex; gap: 8px; }
+        .search-box input {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .search-box button {
+            background: var(--accent);
+            border: none;
+            padding: 0 18px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .hero {
+            background: linear-gradient(145deg, var(--bg-secondary), var(--bg-primary));
+            border-radius: 2rem;
+            padding: 48px 32px;
+            margin: 32px 0;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+        .hero h1 { font-size: 2.5rem; }
+        .social-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .social-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .social-btn.tiktok { background: #000000; color: white; border: 1px solid #25F4EE; }
+        .social-btn.youtube { background: #ff0000; color: white; }
+        .social-btn.whatsapp { background: #25D366; color: white; }
+        .social-btn:hover { transform: scale(1.03); opacity: 0.9; }
+        
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 48px;
+        }
+        .video-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s;
+            border: 1px solid var(--border);
+        }
+        .video-card:hover { transform: translateY(-5px); }
+        .video-thumbnail {
+            position: relative;
+            cursor: pointer;
+            background: #000;
+        }
+        .video-thumbnail img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            opacity: 0.9;
+            transition: 0.2s;
+        }
+        .video-card:hover .video-thumbnail img { opacity: 0.7; }
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            transition: 0.2s;
+        }
+        .video-card:hover .play-overlay { background: var(--accent); transform: translate(-50%, -50%) scale(1.1); }
+        .video-info { padding: 20px; }
+        .video-info h3 { margin-bottom: 8px; color: var(--text-primary); }
+        .video-info p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px; }
+        
+        /* Upload Panel */
+        .upload-panel {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 28px;
+            margin: 30px 0;
+            border: 2px solid var(--accent);
+            box-shadow: var(--card-shadow);
+        }
+        .upload-panel h3 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            align-items: center;
+        }
+        .form-row label {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        .upload-form input, .upload-form select, .upload-form textarea {
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        .upload-form button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .upload-form button:hover { opacity: 0.9; transform: scale(1.01); }
+        
+        /* Downloads Grid */
+        .downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        .download-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+            position: relative;
+        }
+        .download-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow); }
+        .download-type {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .type-game { background: #8b5cf6; color: white; }
+        .type-software { background: #3b82f6; color: white; }
+        .download-card h3 { margin: 15px 0 8px 0; font-size: 1.2rem; }
+        .download-card p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; }
+        .download-link-btn {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .download-link-btn:hover { background: #0d9488; transform: scale(1.02); }
+        .delete-download {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.7rem;
+        }
+        .download-date {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+        
+        .admin-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            transition: 0.2s;
+        }
+        .admin-toggle:hover { transform: scale(1.05); }
+        
+        .hidden-admin {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 16px;
+            z-index: 999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 280px;
+        }
+        .hidden-admin.show { display: block; }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 28px;
+            margin-bottom: 48px;
+        }
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s;
+            border: 1px solid var(--border);
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-content { padding: 20px; }
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+        }
+        .rating i { color: #facc15; cursor: pointer; }
+        .contact-form, .comments-area {
+            background: var(--bg-secondary);
+            padding: 32px;
+            border-radius: 24px;
+            margin: 40px 0;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; }
+            .hero h1 { font-size: 1.8rem; }
+            .videos-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; gap: 5px; }
+        }
+        .comment { border-bottom: 1px solid var(--border); padding: 16px 0; }
+        .section-title {
+            font-size: 1.8rem;
+            margin: 40px 0 24px 0;
+            border-right: 5px solid var(--accent);
+            padding-right: 16px;
+        }
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+        @media (max-width: 768px) { .two-columns { grid-template-columns: 1fr; } }
+        .stats-card {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+            color: white;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body>
 
-    <!-- الشريط العلوي -->
-    <header class="bg-gray-800 border-b border-gray-700 p-4 shadow-lg">
-        <div class="container mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-purple-600 p-2 rounded-lg">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                    </svg>
-                </div>
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    محرر بايثون
-                </h1>
-            </div>
-            
-            <div class="flex gap-3">
-                <button onclick="runCode()" id="runBtn" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2">
-                    <span>▶ تشغيل</span>
-                </button>
-                <button onclick="clearCode()" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-semibold transition">
-                    مسح
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- المحتوى الرئيسي -->
-    <main class="container mx-auto p-4">
-        <!-- حالة التحميل -->        <div id="loading" class="bg-blue-900/50 border border-blue-500 rounded-lg p-4 mb-4 text-center">
-            <div class="animate-pulse">جاري تحميل بايثون... يرجى الانتظار</div>
-            <div class="text-sm text-blue-300 mt-2">قد يستغرق دقيقة في أول مرة</div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            
-            <!-- المحرر -->
-            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
-                <div class="bg-gray-700 px-4 py-2 flex items-center justify-between">
-                    <span class="text-gray-400 text-sm">main.py</span>
-                </div>
-                <div id="editor-container"></div>
-            </div>
-
-            <!-- الكونسول -->
-            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
-                <div class="bg-gray-700 px-4 py-3">
-                    <h2 class="font-semibold text-green-400">المخرجات</h2>
-                </div>
-                <div id="console" class="console-output p-4 text-green-400 text-sm h-full min-h-[200px]">
-                    <div class="text-gray-500">في انتظار التنفيذ...</div>
+<header>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-gamepad"></i></div>
+                <div>
+                    <div class="logo-text">GAMEFIXER</div>
+                    <div class="logo-sub">FIX · PLAY · WIN</div>
                 </div>
             </div>
-        </div>
-
-        <!-- أمثلة -->
-        <div class="mt-6 bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h3 class="text-lg font-semibold mb-4 text-purple-400">أمثلة:</h3>
-            <div class="flex gap-3 flex-wrap">
-                <button onclick="setExample('hello')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
-                    Hello World
-                </button>
-                <button onclick="setExample('calc')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
-                    آلة حاسبة
-                </button>
-                <button onclick="setExample('loop')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
-                    Loop
-                </button>
+            <div class="nav-links">
+                <a href="#" data-tab="home">الرئيسية</a>
+                <a href="#" data-tab="videos">🎬 فيديوهات</a>
+                <a href="#" data-tab="downloads-section">📦 تحميلات</a>
+                <a href="#" data-tab="programming">💻 برمجة</a>
+                <a href="#" data-tab="games">🎮 ألعاب</a>
+                <a href="#" data-tab="windows">🛠️ ويندوز</a>
+                <a href="#" data-tab="about">عنّي</a>
+                <a href="#" data-tab="contact">تواصل</a>
             </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="بحث...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+            <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button>
         </div>
-    </main>
+    </div>
+</header>
 
-    <!-- تحميل Pyodide -->
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-    <!-- تحميل Monaco Editor -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+<main class="container" id="mainContent"></main>
+
+<!-- Hidden Admin Panel for earnings (مخفي) -->
+<div class="admin-toggle" id="adminToggleBtn">
+    <i class="fas fa-chart-line"></i>
+</div>
+<div class="hidden-admin" id="hiddenAdminPanel">
+    <h4 style="margin-bottom: 12px;"><i class="fas fa-dollar-sign"></i> إحصائيات الموقع</h4>
+    <div id="hiddenStats"></div>
+    <button class="delete-download" id="hiddenResetBtn" style="width:100%; margin-top:10px;">تصفير الإحصائيات</button>
+</div>
+
+<div id="videoModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; justify-content:center; align-items:center;">
+    <div style="position:relative; width:90%; max-width:1000px; background:#000; border-radius:20px;">
+        <span style="position:absolute; top:-40px; right:0; color:white; font-size:30px; cursor:pointer;" id="closeModalBtn">&times;</span>
+        <iframe id="modalIframe" src="" style="width:100%; aspect-ratio:16/9; border:none;" frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 GameFixer - حلول برمجية، ألعاب، وشروحات ويندوز</p>
+    <div style="margin-top: 12px;">
+        <a href="https://youtube.com/@algamers-b7l" target="_blank"><i class="fab fa-youtube fa-lg"></i></a>
+        <a href="https://www.tiktok.com/@algamers40" target="_blank"><i class="fab fa-tiktok fa-lg"></i></a>
+        <a href="https://whatsapp.com/channel/0029VbC8hDQAjPXIO2CSeV2U" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
+    </div>
+</footer>
+
+<script>
+    // ========== DOWNLOADS SYSTEM (Games & Software) ==========
+    let downloadsList = JSON.parse(localStorage.getItem("gamefixer_downloads")) || [
+        { id: "1", title: "GTA V - النسخة الكاملة", description: "لعبة الأكشن الشهيرة مع جميع الإضافات", type: "game", link: "https://example.com/gta5", date: "2025-03-01" },
+        { id: "2", title: "Adobe Photoshop 2025", description: "برنامج تصميم الصور الاحترافي", type: "software", link: "https://example.com/photoshop", date: "2025-02-28" },
+        { id: "3", title: "PUBG Mobile - نسخة الكمبيوتر", description: "تجربة اللعبة على PC بأداء عالي", type: "game", link: "https://example.com/pubg", date: "2025-02-25" },
+        { id: "4", title: "CCleaner Pro", description: "تنظيف وتسريع الكمبيوتر", type: "software", link: "https://example.com/ccleaner", date: "2025-02-20" }
+    ];
     
-    <script>
-        let editor;        let pyodide = null;
-        let isPyodideLoading = false;
-
-        // تهيئة المحرر
-        require.config({ 
-            paths: { 
-                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' 
-            } 
+    function saveDownloads() { localStorage.setItem("gamefixer_downloads", JSON.stringify(downloadsList)); }
+    
+    function addDownload(title, description, type, link) {
+        if(!title || !link) { alert("⚠️ الرجاء إدخال عنوان ورابط التحميل"); return false; }
+        const newDownload = {
+            id: Date.now().toString(),
+            title: title,
+            description: description || "لا يوجد وصف",
+            type: type,
+            link: link,
+            date: new Date().toISOString().split('T')[0]
+        };
+        downloadsList.unshift(newDownload);
+        saveDownloads();
+        return true;
+    }
+    
+    function deleteDownload(id) {
+        downloadsList = downloadsList.filter(d => d.id !== id);
+        saveDownloads();
+        loadTab(currentTab);
+    }
+    
+    function renderUploadSection() {
+        return `
+            <div class="upload-panel">
+                <h3><i class="fas fa-cloud-upload-alt"></i> رفع لعبة أو برنامج جديد</h3>
+                <div class="upload-form">
+                    <div class="form-row">
+                        <label>📌 النوع:</label>
+                        <select id="uploadType">
+                            <option value="game">🎮 لعبة</option>
+                            <option value="software">💻 برنامج</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>📝 العنوان:</label>
+                        <input type="text" id="uploadTitle" placeholder="مثال: GTA V - النسخة الكاملة">
+                    </div>
+                    <div class="form-row">
+                        <label>📖 الوصف:</label>
+                        <textarea id="uploadDesc" rows="2" placeholder="وصف مختصر للعبة أو البرنامج..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>🔗 رابط التحميل:</label>
+                        <input type="url" id="uploadLink" placeholder="https://example.com/file.zip">
+                    </div>
+                    <button id="submitUploadBtn"><i class="fas fa-plus-circle"></i> إضافة التحميل</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderDownloadsList() {
+        if(downloadsList.length === 0) {
+            return `<div class="hero"><p>📦 لا توجد تحميلات حالياً. أضف أول لعبة أو برنامج من اللوحة أعلاه!</p></div>`;
+        }
+        let html = `<div class="downloads-grid">`;
+        downloadsList.forEach(item => {
+            const typeClass = item.type === 'game' ? 'type-game' : 'type-software';
+            const typeText = item.type === 'game' ? '🎮 لعبة' : '💻 برنامج';
+            html += `
+                <div class="download-card">
+                    <div class="download-type ${typeClass}">${typeText}</div>
+                    <h3>${escapeHtml(item.title)}</h3>
+                    <p>${escapeHtml(item.description)}</p>
+                    <a href="${item.link}" target="_blank" class="download-link-btn"><i class="fas fa-download"></i> تحميل الآن</a>
+                    <div class="download-date"><i class="far fa-calendar-alt"></i> ${item.date}</div>
+                    <button class="delete-download" data-id="${item.id}"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+            `;
         });
-
-        require(['vs/editor/editor.main'], function() {
-            editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: '# اكتب كود بايثون هنا\nprint("Hello World!")\n',
-                language: 'python',
-                theme: 'vs-dark',
-                fontSize: 14,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                automaticLayout: true
+        html += `</div>`;
+        return html;
+    }
+    
+    // ========== EARNINGS SYSTEM (HIDDEN - مخفي تماماً) ==========
+    let adClicks = parseInt(localStorage.getItem("gamefixer_adClicks")) || 0;
+    let adImpressions = parseInt(localStorage.getItem("gamefixer_adImpressions")) || 0;
+    let estimatedRevenue = parseFloat(localStorage.getItem("gamefixer_revenue")) || 0;
+    const AVERAGE_RPM = 3.5;
+    
+    function updateHiddenStats() {
+        estimatedRevenue = (adImpressions * AVERAGE_RPM) / 1000;
+        localStorage.setItem("gamefixer_revenue", estimatedRevenue.toFixed(2));
+        const statsDiv = document.getElementById("hiddenStats");
+        if(statsDiv) {
+            statsDiv.innerHTML = `
+                <div class="stats-card"><h4>👁️ مشاهدات</h4><div class="value">${adImpressions.toLocaleString()}</div></div>
+                <div class="stats-card"><h4>🖱️ نقرات</h4><div class="value">${adClicks.toLocaleString()}</div></div>
+                <div class="stats-card"><h4>💰 أرباح تقديرية</h4><div class="value">$${estimatedRevenue.toFixed(2)}</div></div>
+            `;
+        }
+    }
+    
+    // ========== VIDEO SYSTEM ==========
+    let videosList = JSON.parse(localStorage.getItem("gamefixer_videos")) || [
+        { id: "1", title: "شرح تحسين أداء ويندوز 11", description: "حلول سريعة وفعالة", youtubeId: "dQw4w9WgXcQ", date: "2025-03-01" },
+        { id: "2", title: "أساسيات JavaScript", description: "تعلم JS من الصفر", youtubeId: "PkZNo7MFNFg", date: "2025-02-25" },
+        { id: "3", title: "أفضل 5 ألعاب 2025", description: "مراجعة كاملة", youtubeId: "kXYiU_JCYtU", date: "2025-02-20" }
+    ];
+    
+    function saveVideos() { localStorage.setItem("gamefixer_videos", JSON.stringify(videosList)); }
+    function getYoutubeId(url) {
+        if(!url) return "";
+        const patterns = [/(?:youtube\.com\/watch\?v=)([^&]+)/, /(?:youtu\.be\/)([^?]+)/];
+        for(let pattern of patterns) { const match = url.match(pattern); if(match) return match[1]; }
+        return url;
+    }
+    function addVideo(title, description, youtubeInput) {
+        if(!title || !youtubeInput) { alert("الرجاء إدخال عنوان ورابط الفيديو"); return false; }
+        const youtubeId = getYoutubeId(youtubeInput);
+        if(!youtubeId) { alert("رابط يوتيوب غير صحيح"); return false; }
+        const newVideo = { id: Date.now().toString(), title, description: description || "لا يوجد وصف", youtubeId, date: new Date().toISOString().split('T')[0] };
+        videosList.unshift(newVideo);
+        saveVideos();
+        return true;
+    }
+    function deleteVideo(id) { videosList = videosList.filter(v => v.id !== id); saveVideos(); loadTab(currentTab); }
+    
+    function renderVideosPage() {
+        let videosHtml = `<h2 class="section-title">🎬 جميع الفيديوهات</h2>`;
+        if(videosList.length === 0) videosHtml += `<div class="hero"><p>📹 لا توجد فيديوهات</p></div>`;
+        else {
+            videosHtml += `<div class="videos-grid">`;
+            videosList.forEach(video => {
+                videosHtml += `<div class="video-card"><div class="video-thumbnail" data-video-id="${video.youtubeId}"><img src="https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg"><div class="play-overlay"><i class="fas fa-play"></i></div></div><div class="video-info"><h3>${escapeHtml(video.title)}</h3><p>${escapeHtml(video.description)}</p><button class="delete-download" data-id="${video.id}" data-type="video"><i class="fas fa-trash"></i> حذف</button></div></div>`;
+            });
+            videosHtml += `</div>`;
+        }
+        videosHtml += `<div class="upload-panel"><h3><i class="fab fa-youtube"></i> إضافة فيديو جديد</h3><div class="upload-form"><input type="text" id="newVideoTitle" placeholder="عنوان الفيديو *"><textarea id="newVideoDesc" rows="2" placeholder="وصف الفيديو"></textarea><input type="text" id="newVideoUrl" placeholder="رابط يوتيوب *"><button id="addVideoBtn" style="background:var(--accent);"><i class="fab fa-youtube"></i> إضافة الفيديو</button></div></div>`;
+        return videosHtml;
+    }
+    
+    // ========== DOWNLOADS PAGE ==========
+    function renderDownloadsPage() {
+        return `
+            <h2 class="section-title">📦 تحميل الألعاب والبرامج</h2>
+            ${renderUploadSection()}
+            ${renderDownloadsList()}
+        `;
+    }
+    
+    function escapeHtml(str) { if(!str) return ""; return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
+    
+    // ========== CONTENT DATA ==========
+    const postsData = {
+        programming: [{ title: "HTML من الصفر", desc: "دليلك الشامل", badge: "HTML/CSS", rating: 4, views: 1240 }, { title: "JavaScript ES6", desc: "المصفوفات والدوال", badge: "JavaScript", rating: 5, views: 890 }, { title: "مشروع حاسبة", desc: "كود جاهز", badge: "مشروع", rating: 4, views: 2100 }],
+        games: [{ title: "مراجعة PUBG 2025", desc: "أفضل الاستراتيجيات", badge: "PUBG", rating: 5, views: 3400 }, { title: "GTA V مودات", desc: "إضافات واقعية", badge: "مودات", rating: 4, views: 2150 }],
+        windows: [{ title: "حل بطء الويندوز", desc: "تعطيل الخدمات", badge: "حلول", rating: 5, views: 5600 }, { title: "تثبيت ويندوز 11", desc: "شرح مصور", badge: "شروحات", rating: 5, views: 9200 }]
+    };
+    
+    const mostViewed = [...postsData.programming, ...postsData.games, ...postsData.windows].sort((a,b)=> (b.views||0) - (a.views||0)).slice(0,4);
+    let currentTab = "home";
+    let commentsList = JSON.parse(localStorage.getItem("siteComments")) || [];
+    
+    function renderStars(rating, itemId) {
+        let starsHtml = `<div class="rating" data-id="${itemId}">`;
+        for(let i=1;i<=5;i++) starsHtml += `<i class="${i <= rating ? "fas fa-star" : "far fa-star"}" data-value="${i}"></i>`;
+        starsHtml += `</div>`;
+        return starsHtml;
+    }
+    
+    function attachRatingEvents() {
+        document.querySelectorAll('.rating i').forEach(star => {
+            star.addEventListener('click', (e) => {
+                const ratingValue = parseInt(star.getAttribute('data-value'));
+                const parentDiv = star.closest('.rating');
+                const itemId = parentDiv.getAttribute('data-id');
+                if(itemId) {
+                    localStorage.setItem(`rating_${itemId}`, ratingValue);
+                    for(let i=0;i<parentDiv.children.length;i++) parentDiv.children[i].className = (i+1) <= ratingValue ? "fas fa-star" : "far fa-star";
+                }
             });
         });
-
-        // تحميل Pyodide مرة واحدة
-        async function initPyodide() {
-            if (pyodide || isPyodideLoading) return pyodide;
-            
-            isPyodideLoading = true;
-            try {
-                pyodide = await loadPyodide({
-                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"
-                });
-                document.getElementById('loading').style.display = 'none';
-                addToConsole('✅ جاهز للتشغيل!');
-                return pyodide;
-            } catch (error) {
-                addToConsole('❌ خطأ في التحميل: ' + error.message, 'error');
-                isPyodideLoading = false;
-                return null;
-            }
-        }
-
-        // تشغيل الكود
-        async function runCode() {
-            const runBtn = document.getElementById('runBtn');
-            const code = editor.getValue();
-            
-            if (!code.trim()) {
-                addToConsole('⚠️ اكتب كود أولاً!', 'error');
-                return;
-            }
-            runBtn.innerHTML = '<span>⏳ جاري التنفيذ...</span>';
-            runBtn.disabled = true;
-            
-            try {
-                // تحميل Pyodide لو مش محمل
-                if (!pyodide) {
-                    await initPyodide();
-                    if (!pyodide) {
-                        runBtn.innerHTML = '<span>▶ تشغيل</span>';
-                        runBtn.disabled = false;
-                        return;
-                    }
-                }
-
-                addToConsole('🚀 executing...\n' + '='.repeat(40));
-                
-                // تشغيل الكود
-                await pyodide.runPythonAsync(code);
-                
-            } catch (error) {
-                addToConsole('❌ Error: ' + error.message, 'error');
-            } finally {
-                runBtn.innerHTML = '<span>▶ تشغيل</span>';
-                runBtn.disabled = false;
-            }
-        }
-
-        // إضافة للكونسول
-        function addToConsole(text, type = 'normal') {
-            const consoleDiv = document.getElementById('console');
-            if (consoleDiv.children[0]?.textContent === 'في انتظار التنفيذ...') {
-                consoleDiv.innerHTML = '';
-            }
-            
-            const line = document.createElement('div');
-            line.className = 'mb-2 ' + (type === 'error' ? 'text-red-400' : 'text-green-400');
-            line.textContent = text;
-            consoleDiv.appendChild(line);
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        }
-
-        // مسح الكود
-        function clearCode() {
-            editor.setValue('');
-            document.getElementById('console').innerHTML = '<div class="text-gray-500">في انتظار التنفيذ...</div>';
-        }
-
-        // الأمثلة
-        function setExample(type) {            const examples = {
-                hello: 'print("Hello World!")\nname = input("What is your name? ")\nprint(f"Welcome {name}!")',
-                calc: 'num1 = 10\nnum2 = 5\nprint(f"{num1} + {num2} = {num1 + num2}")\nprint(f"{num1} * {num2} = {num1 * num2}")',
-                loop: 'for i in range(1, 6):\n    print(f"Count: {i}")\nprint("Done!")'
-            };
-            
-            if (editor && examples[type]) {
-                editor.setValue(examples[type]);
-            }
-        }
-
-        // تهيئة Pyodide عند التحميل
-        window.addEventListener('load', () => {
-            initPyodide();
+    }
+    
+    function renderCards(items, sectionKey) {
+        let html = `<div class="cards-grid">`;
+        items.forEach((item, idx) => {
+            const uniqueId = `${sectionKey}_${idx}`;
+            let savedRating = localStorage.getItem(`rating_${uniqueId}`);
+            let finalRating = savedRating ? parseInt(savedRating) : (item.rating || 3);
+            html += `<div class="card"><div class="card-content"><span class="badge">${item.badge}</span><h3>${item.title}</h3><p>${item.desc}</p>${renderStars(finalRating, uniqueId)}${item.views ? `<div><i class="fas fa-eye"></i> ${item.views} مشاهدة</div>` : ''}</div></div>`;
         });
-    </script>
+        html += `</div>`;
+        return html;
+    }
+    
+    function renderHome() {
+        return `<div class="hero"><h1>مرحباً بك في GameFixer 🎮</h1><p>حلول برمجية، مراجعات ألعاب، وشروحات ويندوز - حمّل أحدث الألعاب والبرامج</p><div class="social-buttons"><a href="https://youtube.com/@algamers-b7l" target="_blank" class="social-btn youtube"><i class="fab fa-youtube"></i> يوتيوب</a><a href="https://www.tiktok.com/@algamers40" target="_blank" class="social-btn tiktok"><i class="fab fa-tiktok"></i> تيك توك</a><a href="https://whatsapp.com/channel/0029VbC8hDQAjPXIO2CSeV2U" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a></div></div>
+        <h2 class="section-title">🎬 أحدث الفيديوهات</h2>
+        <div class="videos-grid">${videosList.slice(0,3).map(video => `<div class="video-card"><div class="video-thumbnail" data-video-id="${video.youtubeId}"><img src="https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg"><div class="play-overlay"><i class="fas fa-play"></i></div></div><div class="video-info"><h3>${escapeHtml(video.title)}</h3><p>${escapeHtml(video.description.substring(0,80))}...</p></div></div>`).join('')}</div>
+        <h2 class="section-title">📦 أحدث التحميلات</h2>
+        <div class="downloads-grid">${downloadsList.slice(0,3).map(item => `<div class="download-card"><div class="download-type ${item.type === 'game' ? 'type-game' : 'type-software'}">${item.type === 'game' ? '🎮 لعبة' : '💻 برنامج'}</div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description.substring(0,60))}...</p><a href="${item.link}" target="_blank" class="download-link-btn"><i class="fas fa-download"></i> تحميل</a></div>`).join('')}</div>
+        <h2 class="section-title">🏆 الأكثر مشاهدة</h2>
+        <div class="cards-grid">${mostViewed.map(item => `<div class="card"><div class="card-content"><span class="badge">⭐</span><h3>${item.title}</h3><p>${item.desc}</p><i class="fas fa-chart-line"></i> ${item.views} مشاهدة</div></div>`).join('')}</div>`;
+    }
+    
+    function renderProgramming() { return `<h2 class="section-title">💻 تعلم البرمجة</h2>${renderCards(postsData.programming, "prog")}`; }
+    function renderGames() { return `<h2 class="section-title">🎮 مراجعات الألعاب</h2>${renderCards(postsData.games, "game")}`; }
+    function renderWindows() { return `<h2 class="section-title">🛠️ حلول ويندوز</h2>${renderCards(postsData.windows, "win")}`; }
+    function renderAbout() { return `<div class="hero"><h2>من أنا؟</h2><p>أنا عبدالرحمن باشير، مبرمج ومحتوى تقني. أقدم شروحات برمجية، مراجعات ألعاب، وحلول ويندوز.</p><div style="background:var(--code-bg);padding:12px 20px;border-radius:60px;display:inline-block;cursor:pointer;" id="revealEmailBtn"><i class="fas fa-envelope"></i> اضغط لإظهار البريد</div><p id="emailDisplay" style="margin-top:10px;"></p></div>`; }
+    function renderContact() { return `<div class="contact-form"><h2>تواصل معي</h2><form id="contactForm"><input placeholder="اسمك" required><input type="email" placeholder="بريدك"><textarea rows="4" placeholder="رسالتك"></textarea><button type="submit">إرسال</button></form><p id="formMsg"></p></div>`; }
+    function renderCommentsSection() {
+        let html = `<div class="comments-area"><h3>💬 التعليقات</h3><div id="commentsList">`;
+        commentsList.forEach(com => { html += `<div class="comment"><strong>${com.name}</strong><p>${com.text}</p><small>${com.date}</small></div>`; });
+        html += `</div><textarea id="newCommentName" placeholder="اسمك" rows="1" style="width:30%"></textarea><textarea id="newCommentText" placeholder="تعليقك..." rows="3"></textarea><button id="submitCommentBtn" class="download-link-btn" style="background:var(--accent);">أضف تعليق</button></div>`;
+        return html;
+    }
+    
+    function attachVideoEvents() {
+        document.querySelectorAll('.video-thumbnail').forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                const videoId = thumb.getAttribute('data-video-id');
+                const modal = document.getElementById('videoModal');
+                document.getElementById('modalIframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                modal.style.display = 'flex';
+            });
+        });
+        document.querySelectorAll('.delete-download').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                const type = btn.getAttribute('data-type');
+                if(confirm('هل تريد الحذف؟')) {
+                    if(type === 'video') deleteVideo(id);
+                    else deleteDownload(id);
+                }
+            });
+        });
+    }
+    
+    function loadTab(tabId) {
+        currentTab = tabId;
+        let content = "";
+        switch(tabId) {
+            case "home": content = renderHome(); break;
+            case "videos": content = renderVideosPage(); break;
+            case "downloads-section": content = renderDownloadsPage(); break;
+            case "programming": content = renderProgramming(); break;
+            case "games": content = renderGames(); break;
+            case "windows": content = renderWindows(); break;
+            case "about": content = renderAbout(); break;
+            case "contact": content = renderContact(); break;
+            default: content = renderHome();
+        }
+        if(tabId !== "contact" && tabId !== "about" && tabId !== "videos" && tabId !== "downloads-section") content += renderCommentsSection();
+        document.getElementById("mainContent").innerHTML = content;
+        attachRatingEvents();
+        attachVideoEvents();
+        
+        if(tabId === "videos") {
+            const addBtn = document.getElementById("addVideoBtn");
+            if(addBtn) addBtn.addEventListener("click", () => {
+                const title = document.getElementById("newVideoTitle").value;
+                const desc = document.getElementById("newVideoDesc").value;
+                const url = document.getElementById("newVideoUrl").value;
+                if(addVideo(title, desc, url)) { alert("✅ تم إضافة الفيديو"); loadTab("videos"); }
+            });
+        }
+        
+        if(tabId === "downloads-section") {
+            const submitBtn = document.getElementById("submitUploadBtn");
+            if(submitBtn) submitBtn.addEventListener("click", () => {
+                const type = document.getElementById("uploadType").value;
+                const title = document.getElementById("uploadTitle").value;
+                const desc = document.getElementById("uploadDesc").value;
+                const link = document.getElementById("uploadLink").value;
+                if(addDownload(title, desc, type, link)) {
+                    alert("✅ تم إضافة التحميل بنجاح!");
+                    document.getElementById("uploadTitle").value = "";
+                    document.getElementById("uploadDesc").value = "";
+                    document.getElementById("uploadLink").value = "";
+                    loadTab("downloads-section");
+                }
+            });
+        }
+        
+        if(tabId === "about") {
+            const revealBtn = document.getElementById("revealEmailBtn");
+            if(revealBtn) revealBtn.onclick = () => { document.getElementById("emailDisplay").innerHTML = "📧 abdulrahmanbashir573@gmail.com"; };
+        }
+        if(tabId === "contact") {
+            const form = document.getElementById("contactForm");
+            if(form) form.addEventListener("submit", (e) => { e.preventDefault(); document.getElementById("formMsg").innerHTML = "✅ تم الإرسال"; form.reset(); });
+        }
+        const commentBtn = document.getElementById("submitCommentBtn");
+        if(commentBtn) commentBtn.onclick = () => {
+            const name = document.getElementById("newCommentName")?.value.trim() || "زائر";
+            const text = document.getElementById("newCommentText")?.value.trim();
+            if(text) { commentsList.unshift({ name, text, date: new Date().toLocaleString() }); localStorage.setItem("siteComments", JSON.stringify(commentsList)); loadTab(currentTab); }
+        };
+    }
+    
+    // Hidden admin panel
+    const adminToggle = document.getElementById('adminToggleBtn');
+    const adminPanel = document.getElementById('hiddenAdminPanel');
+    let adminVisible = false;
+    adminToggle.addEventListener('click', () => { adminVisible = !adminVisible; if(adminVisible) { adminPanel.classList.add('show'); updateHiddenStats(); } else { adminPanel.classList.remove('show'); } });
+    document.getElementById('hiddenResetBtn')?.addEventListener('click', () => {
+        if(confirm('تصفير الإحصائيات؟')) {
+            adClicks = 0; adImpressions = 0; estimatedRevenue = 0;
+            localStorage.setItem("gamefixer_adClicks", 0); localStorage.setItem("gamefixer_adImpressions", 0); localStorage.setItem("gamefixer_revenue", 0);
+            updateHiddenStats(); alert('✅ تم التصفير');
+        }
+    });
+    
+    // Modal close
+    const modal = document.getElementById('videoModal');
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => { modal.style.display = 'none'; document.getElementById('modalIframe').src = ''; });
+    window.addEventListener('click', (e) => { if(e.target === modal) { modal.style.display = 'none'; document.getElementById('modalIframe').src = ''; } });
+    
+    // Dark mode
+    const darkToggle = document.getElementById("darkModeToggle");
+    darkToggle.addEventListener("click", () => { document.body.classList.toggle("dark"); localStorage.setItem("darkMode", document.body.classList.contains("dark")); });
+    if(localStorage.getItem("darkMode") === "true") document.body.classList.add("dark");
+    
+    document.querySelectorAll(".nav-links a").forEach(link => { link.addEventListener("click", (e) => { e.preventDefault(); loadTab(link.getAttribute("data-tab")); window.scrollTo({ top: 0 }); }); });
+    document.getElementById("searchBtn").addEventListener("click", () => { alert("🔍 بحث"); });
+    
+    loadTab("home");
+</script>
 </body>
-</html>
+    </html>
